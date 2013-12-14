@@ -12,8 +12,8 @@ package gp
     However, this algorithm is numerically stable, the noise term can be very small and the inversion can still be calculated...
 */
 func ApproximateInversion(A *Matrix, u *Vector, theta float64, dim int64) *Vector {
-    max_itr := 10
-    tol := 1.0
+    max_itr := 500
+    tol := 0.01
 
     C := NewMatrix()
     for key, val := range A.data {
