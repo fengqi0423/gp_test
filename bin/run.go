@@ -4,6 +4,7 @@ import (
     "os"
     "gp"
     "fmt"
+    "math"
 )
 
 func test_inversion() {
@@ -19,26 +20,10 @@ func test_inversion() {
     fmt.Printf("%f %f\n", v.GetValue(0), v.GetValue(1))
 }
 
-func test_data_gen() {
-    min := -2.0
-    max := 2.0
-    period := 4.0
-    amp := 10.0 
-    noise := 2.0
-    count := 100
-    sample_count := 20
-
-    X, Y := gp.GenNoisySin(min, max, period, amp, 0.0, count)
-    fo, _ := os.Create("real.csv")
-    for i := 0; i < count; i++ {
+func output_XY(X *[]float64, Y *[]float64, noise float64, outf string) {
+    fo, _ := os.Create(outf)
+    for i := 0; i < len(*X); i++ {
         fo.WriteString(fmt.Sprintf("%f,%f,%f,%f\n", (*X)[i], (*Y)[i], (*Y)[i]-noise, (*Y)[i]+noise))
-    }
-    fo.Close()
-
-    X, Y = gp.GenNoisySin(min, max, period, amp, noise, sample_count)
-    fo, _ = os.Create("sample.csv")
-    for i := 0; i < sample_count; i++ {
-        fo.WriteString(fmt.Sprintf("%f,%f\n", (*X)[i], (*Y)[i]))
     }
     fo.Close()
 }
@@ -66,11 +51,13 @@ func test_gp() {
     max := 2.0
     period := 4.0
     amp := 1.0
-    noise := 0.2
-    count := 100
+    noise := 0.1
+    count := 200
 
-    radius := 0.1
-    camp := 1.0
+    radius := 0.05
+    camp := 5.0
+
+    x_pred := 1.0
 
     cf := gp.CovSEARD{}
     radiuses := make(map[int64]float64)
@@ -84,22 +71,29 @@ func test_gp() {
     t := array2vector(Y)
     Xv := array2vectorlist(X)
     cov := gp.CovMatrix(Xv, cf.Cov)
-/*
-    for i := int64(0); i < int64(count); i++ {
-        for j := int64(0); j < int64(count); j++ {
-            fmt.Printf("%3.3e  ", cov.GetValue(i,j))
-        }
-        fmt.Println()
-    }
-    */
-    C_inv_t := gp.ApproximateInversion(cov, t, 1e-8, 1)
+
+    C_inv_t := gp.ApproximateInversion(cov, t, 1e-8, int64(count))
 
     x := gp.NewVector()
-    x.SetValue(0, 1.0)
+    x.SetValue(0, x_pred)
+
+    // Get mean
     k := gp.CovVector(Xv, x, cf.Cov)
     pred := k.Dot(C_inv_t)
 
-    fmt.Printf("%v\n", pred)
+    // Get std
+    C_inv_k := gp.ApproximateInversion(cov, k, 1e-6, int64(count))
+    std := math.Sqrt(cf.Cov(x.GetData(), x.GetData()) - k.Dot(C_inv_k))
+
+    fmt.Printf("%v+-%v\n", pred, std)
+
+    // Output
+    output_XY(X, Y, noise, "train.csv")
+    tmp1 := make([]float64, 1)
+    tmp1[0] = x.GetValue(0)
+    tmp2 := make([]float64, 1)
+    tmp2[0] = pred
+    output_XY(&tmp1, &tmp2, std, "predict.csv")
 }
 
 func main() {

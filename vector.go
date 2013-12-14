@@ -17,6 +17,10 @@ func NewVector() *Vector {
 	return &v
 }
 
+func (v *Vector) GetData() map[int64]float64 {
+	return v.data
+}
+
 func (v *Vector) FromString(buf string) {
 	tks := strings.Split(buf, "|")
 	for _, tk := range tks {
