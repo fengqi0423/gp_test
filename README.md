@@ -11,4 +11,9 @@ https://github.com/xlvector/hector
 
 Current algorithm is based on Mark Gibbs' PhD dissertation
 
-I think using algoirthms in published academic research is fine, but since Hector does not have any lisence yet, please do not distribute this repo or use it for commercial purposes. lol
+Result looks like
+![ScreenShot](https://github.com/fengqi0423/gp_test/blob/master/gp.png)
+
+MIT Lisence if anyone really interested.
+
+
