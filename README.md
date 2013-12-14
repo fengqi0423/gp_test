@@ -12,7 +12,7 @@ https://github.com/xlvector/hector
 Current algorithm is based on Mark Gibbs' PhD dissertation
 
 Result looks like
-![ScreenShot](https://github.com/fengqi0423/gp_test/blob/master/gp.png)
+![ScreenShot](https://github.com/fengqi0423/gp_test/blob/master/gp.png?raw=true)
 
 MIT Lisence if anyone really interested.
 
